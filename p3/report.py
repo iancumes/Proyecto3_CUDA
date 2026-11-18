@@ -99,7 +99,8 @@ def build_report(results, output):
     output.parent.mkdir(parents=True, exist_ok=True)
     summary = load_csv(results / "summary.csv")
     runs = load_csv(results / "runs.csv")
-    complete = bool(summary and "cuda_mean_s" in summary[0])
+    complete = bool(summary and runs and "cuda_mean_s" in summary[0]
+                    and all(int(row["examples"]) == 10440 for row in runs))
     env_path = results / "environment.json"
     env = json.loads(env_path.read_text(encoding="utf-8")) if env_path.is_file() else {}
     styles = getSampleStyleSheet()
@@ -144,20 +145,20 @@ def build_report(results, output):
         ("04 · Retropropagación", "Calcula la pérdida y sus gradientes para entrenar la red."),
         ("05 · Optimización", "Aplica SGD con momentum a los parámetros."),
         ("06 · Validación", "Calcula pérdida y exactitud con la partición reservada para validación."),
-    ], [5, 12])
+    ], [5, 11.5])
     table(["Operación repetitiva", "Datos", "Repeticiones en ASL completo"], [
         ("Preparar imágenes", "JPEG de entrenamiento y validación", "13,920 por preparación"),
         ("Forward y gradientes", "Lotes de hasta 64 imágenes", "164 pasos por época"),
         ("SGD con momentum", "Pesos y estado del optimizador", "2,120,413 parámetros por paso"),
         ("Validar", "3,480 imágenes", "55 lotes por época"),
-    ], [5, 5.5, 6.5])
+    ], [5, 5.5, 6])
     story.append(PageBreak())
     paragraph("2. División del trabajo y diseño CUDA", "Heading2")
     paragraph("Leer archivos, decodificar JPEG y preparar etiquetas son tareas independientes por imagen. "
               "El CPU las distribuye en grupos de 32 mediante un conjunto de procesos. La referencia usa la "
               "misma transformación en serie. El hash de imagen y etiqueta comprueba que los arrays coinciden.")
     paragraph("En GPU, TensorFlow ejecuta convoluciones, capas densas y sus gradientes. El kernel de Numba-CUDA "
-              "actualiza cada parámetro con v ← 0.9v − 0.01g y w ← w + v. Se programan 256 hilos por bloque y "
+              "actualiza cada parámetro con v = 0.9v - 0.01g y w = w + v. Se programan 256 hilos por bloque y "
               "ceil(N/256) bloques por tensor. Cada hilo comprueba su índice y escribe su propia posición. "
               "DLPack y CUDA Array Interface intercambian vistas de memoria GPU entre TensorFlow, CuPy y Numba.")
     paragraph("3. Metodología y resultados", "Heading2")
@@ -169,6 +170,9 @@ def build_report(results, output):
         paragraph(f'<b>Entorno medido.</b> {escape(env["cpu"] or "CPU")} · {env["available_cores"]} núcleos lógicos '
                   f'· Python {env["python"]} · {escape(env.get("gpu", "ejecución local en CPU"))}.')
     if summary:
+        if int(runs[0]["examples"]) != 10440:
+            paragraph(f'<b>Prueba funcional.</b> La muestra contiene {runs[0]["examples"]} imágenes '
+                      "de entrenamiento. Las cifras de esta prueba solo verifican el flujo con una muestra pequeña.")
         displayed_modes = ["cpu", "cuda"] if complete else ["cpu"]
         headers = ["Fase", *[f"{mode.upper()} media ± DE (s)" for mode in displayed_modes]]
         if complete:
@@ -183,7 +187,7 @@ def build_report(results, output):
             if complete:
                 values.append(f'{float(row["speedup"]):.2f}×')
             rows.append(values)
-        table(headers, rows, [17 / len(headers)] * len(headers))
+        table(headers, rows, [16.5 / len(headers)] * len(headers))
         story.append(Image(str(plot_phases(summary, results)), width=16 * cm, height=7.2 * cm))
     if complete:
         story.append(PageBreak())
