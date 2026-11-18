@@ -1,0 +1,7 @@
+# Diseño CUDA
+
+Las convoluciones calculan varios filtros y posiciones espaciales para cada imagen. En CNN2, la primera convolución genera 64 × 64 × 32 activaciones por imagen. Tras el primer pooling, la segunda convolución genera 32 × 32 × 64. El segundo pooling reduce la salida a 16 × 16 × 64, que alimenta capas densas de 128 y 29 unidades. TensorFlow selecciona kernels GPU para el forward y la retropropagación, usando bibliotecas como cuDNN y cuBLAS. Esta ejecución registra el dispositivo de los pesos y del lote.
+
+La actualización SGD aplica por cada parámetro la fórmula v ← 0.9v − 0.01g, w ← w + v. El estado v empieza en cero y persiste entre lotes. En el kernel de Numba-CUDA, un hilo toma el índice global i y actualiza los dos elementos correspondientes. Hay 256 hilos por bloque y ceil(N/256) bloques por tensor. El último bloque puede contener hilos fuera del rango. El entrenamiento usa 164 lotes por época en el manifiesto completo y actualiza 2,120,413 parámetros en cada lote. El primer conjunto denso representa la mayor parte de esas actualizaciones.
+
+El gradiente, los pesos y las velocidades se comparten por DLPack entre TensorFlow y CuPy. CuPy expone esas mismas direcciones de GPU a Numba mediante CUDA Array Interface. El sincronizado al final garantiza que TensorFlow reciba los pesos actualizados y forma parte del tiempo de cómputo. Los costos de lanzar kernels, sincronizar, procesar lotes y transferir datos pueden limitar la aceleración observable.
