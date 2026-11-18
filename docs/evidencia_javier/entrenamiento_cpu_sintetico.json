@@ -1,0 +1,23 @@
+{
+  "mode": "cpu",
+  "epochs": 1,
+  "examples": 87,
+  "batch_size": 64,
+  "parameters": 2120413,
+  "training_s": 0.32550308300415054,
+  "validation_s": 0.044383166008628905,
+  "imgs_per_s": 267.2785744363922,
+  "device": "/job:localhost/replica:0/task:0/device:CPU:0",
+  "tensorflow": "2.21.0",
+  "history": [
+    {
+      "epoch": 1,
+      "last_batch_loss": 3.4987659454345703,
+      "loss": 3.1896936893463135,
+      "accuracy": 0.06896551724137931
+    }
+  ],
+  "h2d_s": 0.0,
+  "compute_s": 0.32500995899317786,
+  "d2h_s": 0.0
+}

@@ -1,0 +1,9 @@
+{
+  "prep_s": 0.6565304590039887,
+  "workers": 2,
+  "counts": {
+    "train": 87,
+    "validation": 29
+  },
+  "arrays_sha256": "88a7759d808947ea498a183116b9ac1aa2286bf72cd26f58add40594f4efea1f"
+}

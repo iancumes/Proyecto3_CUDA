@@ -1,0 +1,5 @@
+phase,cpu_mean_s,cpu_sd_s
+prep_s,0.06718412501504645,
+training_s,0.32550308300415054,
+validation_s,0.044383166008628905,
+total_s,0.4370703740278259,
