@@ -1,0 +1,4 @@
+.s.........                                                              [100%]
+=========================== short test summary info ============================
+SKIPPED [1] tests/test_cuda_training.py:8: Se requiere una GPU para comprobar el kernel real.
+10 passed, 1 skipped in 11.24s

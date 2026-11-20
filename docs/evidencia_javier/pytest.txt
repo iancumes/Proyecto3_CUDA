@@ -1,0 +1,4 @@
+Comando: .venv/bin/python -m pytest -q tests
+Resultado observado antes de combinar la rama de Nery:
+.........                                                                [100%]
+9 passed in 61.37s (0:01:01)

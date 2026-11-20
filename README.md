@@ -11,3 +11,15 @@ El experimento de CC3069 usa CNN2 y el dataset público [ASL Alphabet](https://w
 [Abre el cuaderno en Colab con GPU T4](https://colab.research.google.com/github/iancumes/Proyecto3_CUDA/blob/validacion-colab/Proyecto3_CUDA.ipynb). La rama de validación contiene el código integrado para realizar las mediciones. Consulta [la guía de ejecución](docs/ejecucion_colab.md) para exportar los registros y el informe.
 
 Javier y Nery reciben paquetes de cambios organizados por commit. Cada integrante aplica su paquete en su rama, prueba sus cambios y abre un pull request hacia main.
+
+## Preparación paralela en CPU
+
+El aporte de Javier incorpora `p3/data_parallel.py`: usa varios procesos para decodificar imágenes y conserva el orden y los valores de la referencia secuencial. Consulta [las operaciones de preparación](docs/preparacion_cpu.md) y [la validación y los pendientes de integración](docs/validacion_javier.md).
+
+```bash
+python -m pip install -r requirements-p3.txt
+python -m pytest -q tests
+python -m p3.data --manifest outputs/metrics/split_manifest.csv --out outputs/arrays_paralelos --workers 2
+```
+
+El último comando necesita el dataset y el manifiesto generados con `python -m p3.data --setup`. Las pruebas crean sus propias imágenes y funcionan sin descargar el dataset ni instalar CUDA.
